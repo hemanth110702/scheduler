@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scheduler - Home</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 50vh;
+      justify-content: center;
+      align-items: center;
+      background-color: greenyellow;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Scheduler</h1>
+  <form id="scheduler-form" method="post">
+    <p>Upload Image <input type="file" id="image" name="image"></p>
+    <p>Date & Time: <input type="datetime-local" id="dt" name="datetime"></p>
+    <button type="submit">Schedule</button>
+  </form>
+
+  <div id="timer"></div>
+  <script>
+    function start() {
+      // Set the target date and time statically
+      const targetDateTime = new Date(document.getElementById("dt").value);
+
+      // Update the countdown timer every second
+      const timerInterval = setInterval(updateCountdown, 1000);
+
+      function updateCountdown() {
+        // Calculate the remaining time in seconds
+        const currentTime = new Date().getTime();
+        const remainingTime = Math.floor((targetDateTime - currentTime) / 1000);
+
+        // Check if the countdown has reached zero
+        if (remainingTime <= 0) {
+          clearInterval(timerInterval);
+          document.getElementById("timer").innerHTML = "Countdown Finished!";
+          redirect();
+          return;
+        }
+
+        // Calculate the remaining hours, minutes, and seconds
+        const hours = Math.floor(remainingTime / 3600);
+        const minutes = Math.floor((remainingTime % 3600) / 60);
+        const seconds = remainingTime % 60;
+
+        // Display the remaining time in the timer element
+        document.getElementById("timer").innerHTML = hours.toString().padStart(2, "0") + ":" +
+                                                     minutes.toString().padStart(2, "0") + ":" +
+                                                     seconds.toString().padStart(2, "0");
+      }
+    }
+
+    function redirect() {
+      const form = document.getElementById("scheduler-form");
+      const image = document.getElementById("image").files[0];
+
+      // Create a FormData object
+      const formData = new FormData();
+
+      // Append the image file to the form data
+      formData.append("image", image);
+
+      // Optional: You can append other form data if needed
+      // formData.append("key", "value");
+
+      // Set the action URL for the form
+      form.action = "/result";
+
+      // Set the form data as the form's data transfer object
+      form.dataTransfer = formData;
+
+      // Submit the form
+      form.submit();
+    }
+
+    // Intercept the form submission event
+    document.getElementById("scheduler-form").addEventListener("submit", function(event) {
+      event.preventDefault(); // Prevent the default form submission
+      start(); // Start the countdown
+    });
+  </script>
+</body>
+</html>
